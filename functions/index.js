@@ -36,6 +36,7 @@ const BASIC_WELCOME = 'input.welcome'
 
 // Application vars
 var accessKey = ''
+var customerName = ''
 
 exports.transactions = functions.https.onRequest((request, response) => {
   const app = new ApiAiApp({ request, response });
@@ -59,13 +60,21 @@ function financialReview (app) {
 function basicWelcome(app) {
   // TODO: Login with hardcoded credentials to Security API
 
-  accessKey = apiCalls.apiLogin();
-
-  console.log(accessKey)
+  apiCalls.apiLogin()
+  .then(function(data){
+    accessKey = data.token
+  });
 
   // TODO: Talk to Retail Customers API to get customer information
 
+  apiCalls.customerInfo(accessKey)
+  .then(function(data){
+    customerName = data.person.preferredName
+  })
+
   // TODO: Talk to Retail Accounts to being all the account information
+
+  
 
   // TODO: Talk to Wealth Insight to get investment information
 
@@ -73,7 +82,7 @@ function basicWelcome(app) {
 
   // TODO: Respond to API.AI with name of customer
 
-  app.ask('Hello, Brett. What\'s going on?');
+  app.ask('Hello, '+ customerName +'. What\'s going on?');
 }
 
 //function optionIntent (app) {
