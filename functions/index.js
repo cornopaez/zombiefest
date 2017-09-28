@@ -19,6 +19,7 @@
 process.env.DEBUG = 'actions-on-google:*';
 let ApiAiApp = require('actions-on-google').ApiAiApp;
 const functions = require('firebase-functions');
+const apiCalls = require('./api.js')
 
 // APIAI Actions
 const TRANSACTION_CHECK_NOPAYMENT = 'transaction.check.no.payment';
@@ -32,6 +33,9 @@ const TRANSACTION_DECISION_COMPLETE = 'transaction.decision.complete';
 const OPTION_SELECT = 'option.select';
 const FINANCIAL_REVIEW = 'financial.review'
 const BASIC_WELCOME = 'input.welcome'
+
+// Application vars
+var accessKey = ''
 
 exports.transactions = functions.https.onRequest((request, response) => {
   const app = new ApiAiApp({ request, response });
@@ -54,6 +58,10 @@ function financialReview (app) {
 
 function basicWelcome(app) {
   // TODO: Login with hardcoded credentials to Security API
+
+  accessKey = apiCalls.apiLogin();
+
+  console.log(accessKey)
 
   // TODO: Talk to Retail Customers API to get customer information
 

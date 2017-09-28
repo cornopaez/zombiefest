@@ -19,7 +19,7 @@
     "firebase-admin": "^4.2.1",
     "firebase-functions": "^0.5.7",
     "googleapis": "^19.0.0",
-    "request": "^2.81.0"
+    "request": "^2.83.0"
   },
   "devDependencies": {
     "eslint": "^3.19.0",
