@@ -11,6 +11,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Calendar Data
+// { "calendar": [{ "person": "CraigBooth", "location": "Salisbury, MD", "contact": "2152224545", "dates": ["Sep 30 @ 3pm", "Oct 1 @ 10am"] }, { "person": "RichGuerrini", "location": "Pittsburgh, PA", "contact": "4125551212", "dates": ["Sep 30 @ 4pm", "Oct 1 @ 11am"] } ] }
+
 'use strict';
 
 process.env.DEBUG = 'actions-on-google:*';
@@ -27,46 +30,44 @@ const DELIVERY_ADDRESS_COMPLETE = 'delivery.address.complete';
 const TRANSACTION_DECISION_ACTION_PAYMENT = 'transaction.decision.action';
 const TRANSACTION_DECISION_COMPLETE = 'transaction.decision.complete';
 const OPTION_SELECT = 'option.select';
+const FINANCIAL_REVIEW = 'financial.review'
+const BASIC_WELCOME = 'input.welcome'
 
 exports.transactions = functions.https.onRequest((request, response) => {
   const app = new ApiAiApp({ request, response });
-  console.log('Request headers: ' + JSON.stringify(request.headers));
-  console.log('Request body: ' + JSON.stringify(request.body));
+  // console.log('Request headers: ' + JSON.stringify(request.headers));
+  // console.log('Request body: ' + JSON.stringify(request.body));
 
-function list(app) {
-  app.askWithList(app.buildRichResponse)(
-    // Build a list
-    app.buildList('Offers you can benefit from:')
-    // Add the first item to the list
-    .addItems(app.buildOptionItem('PNC_Mortgage',
-      ['home', 'home mortgage', 'PNC Mortgage', 'mortgage'])
-      .setTitle('PNC Mortgage')
-      .setDescription('Take advantage of current rates as low as 4.125% on a 30 Yr Fixed mortgage.')
-      .setImage('http://ceph.com/wp-content/uploads/2017/03/update.gif', 'PNC Mortgage')
-    )
-    // Add the second item to the list
-    .addItems(app.buildOptionItem('PNC_Cash_Rewards_Visa',
-      ['cash rewards', 'cash rewards visa', 'rewards visa', 'PNC Cash Rewards Visa'])
-      .setTitle('PNC Cash Rewards Visa')
-      .setDescription('Carry the card that gives you more cash back every day for purchases at gas stations, restaurants, grocery stores, and more - with no rotating categories and no annual fee.')
-      .setImage('http://www.animated-gifs.eu/category_money/money-credit-cards/0014.gif', 'PNC Cash Rewards Visa')
-    )
-    // Add third item to the list
-    .addItems(app.buildOptionItem('PNC_Investments',
-      ['investments', 'investment', 'invest'])
-      .setTitle('PNC Investments')
-      .setDescription('PNC offers practical, strategic financial guidance and insight to help you achieve more with your money.  We offer a broad range of investment products and services, from brokerage accounts to comprehensive wealth management.')
-      .setImage('https://cdn.dribbble.com/users/19417/screenshots/1978258/equity-crowdfunding_dribbble_800x600.gif', 'PNC Investments')
-    )
-    // Add fourth item to the list
-    .addItems(app.buildOptionItem('PNC_Mobile_Banking',
-      ['mobile', 'mobile banking', 'PNC Mobile Banking'])
-      .setTitle('PNC Mobile Banking')
-      .setDescription('Manage your money on the go! Check your balance, pay a bill, transfer money and even deposit a check right from your mobile device.')
-      .setImage('https://media.giphy.com/media/jHXFE0Bypb9M4/giphy.gif', 'PNC Mobile Banking')
+function financialReview (app) {
+
+  app.ask(app.buildRichResponse()
+    // Create a basic card and add it to the rich response
+
+    .addSimpleResponse('Check out this offer:')
+    .addBasicCard(app.buildBasicCard('') // Text for offer goes here
+      .setTitle('') // Title for the offer goes here
+      .addButton('Read more', '') // URL for offer goes here
+      .setImage('https://example.google.com/42.png', 'Image alternate text') // Does this need revisiting?
     )
   );
 }
+
+function basicWelcome(app) {
+  // TODO: Login with hardcoded credentials to Security API
+
+  // TODO: Talk to Retail Customers API to get customer information
+
+  // TODO: Talk to Retail Accounts to being all the account information
+
+  // TODO: Talk to Wealth Insight to get investment information
+
+  // TODO: Save that information to customer object for later use
+
+  // TODO: Respond to API.AI with name of customer
+
+  app.ask('Hello, Brett. What\'s going on?');
+}
+
 //function optionIntent (app) {
 //  if (app.getSelectedOption() === PNC_Mortgage) {
 //  if (app.getContextArgument() === PNC_Mortgage) {
@@ -99,6 +100,11 @@ function itemSelected (app) {
     app.ask('You selected an unknown item from the list');
   }
 }
+
+// function financialReview(app) {
+
+// }
+
 function datetime (app) {
   app.askForDateTime('Which of these available dates and times work best for you?', 'What day is best to schedule your appointment?', 'What time of day works best for you?');
 }
@@ -290,6 +296,8 @@ app.buildOrderUpdate('google_order_123', true)
   actionMap.set(TRANSACTION_DECISION_ACTION_PAYMENT, transactionDecision);
   actionMap.set(TRANSACTION_DECISION_COMPLETE, transactionDecisionComplete);
   actionMap.set(OPTION_SELECT, itemSelected);
+  actionMap.set(FINANCIAL_REVIEW, financialReview)
+  actionMap.set(BASIC_WELCOME, basicWelcome)
 
   app.handleRequest(actionMap);
 });
